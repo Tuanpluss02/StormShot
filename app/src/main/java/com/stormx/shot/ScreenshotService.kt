@@ -1,9 +1,6 @@
 package com.stormx.shot
 
 import android.accessibilityservice.AccessibilityService
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -14,8 +11,6 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.view.Display
 import android.view.accessibility.AccessibilityEvent
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,28 +56,40 @@ class ScreenshotService : AccessibilityService() {
             startService(hideIntent)
 
             Handler(Looper.getMainLooper()).postDelayed({
-                takeScreenshot(Display.DEFAULT_DISPLAY, mainExecutor, object : TakeScreenshotCallback {
-                    override fun onSuccess(screenshot: ScreenshotResult) {
-                        val bitmap = Bitmap.wrapHardwareBuffer(screenshot.hardwareBuffer, screenshot.colorSpace)
-                        bitmap?.let { saveScreenshot(it) }
+                takeScreenshot(
+                    Display.DEFAULT_DISPLAY,
+                    mainExecutor,
+                    object : TakeScreenshotCallback {
+                        override fun onSuccess(screenshot: ScreenshotResult) {
+                            val bitmap = Bitmap.wrapHardwareBuffer(
+                                screenshot.hardwareBuffer,
+                                screenshot.colorSpace
+                            )
+                            bitmap?.let { saveScreenshot(it) }
 
-                        Handler(Looper.getMainLooper()).post {
-                            val showIntent = Intent(this@ScreenshotService, FloatingWindowService::class.java).apply {
-                                action = FloatingWindowService.ACTION_SHOW
+                            Handler(Looper.getMainLooper()).post {
+                                val showIntent = Intent(
+                                    this@ScreenshotService,
+                                    FloatingWindowService::class.java
+                                ).apply {
+                                    action = FloatingWindowService.ACTION_SHOW
+                                }
+                                startService(showIntent)
                             }
-                            startService(showIntent)
                         }
-                    }
 
-                    override fun onFailure(errorCode: Int) {
-                        Handler(Looper.getMainLooper()).post {
-                            val showIntent = Intent(this@ScreenshotService, FloatingWindowService::class.java).apply {
-                                action = FloatingWindowService.ACTION_SHOW
+                        override fun onFailure(errorCode: Int) {
+                            Handler(Looper.getMainLooper()).post {
+                                val showIntent = Intent(
+                                    this@ScreenshotService,
+                                    FloatingWindowService::class.java
+                                ).apply {
+                                    action = FloatingWindowService.ACTION_SHOW
+                                }
+                                startService(showIntent)
                             }
-                            startService(showIntent)
                         }
-                    }
-                })
+                    })
             }, 100)
         }
     }

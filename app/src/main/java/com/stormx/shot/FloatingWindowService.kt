@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -85,7 +84,10 @@ class FloatingWindowService : Service() {
             setContent {
                 FloatingButton(
                     onClick = {
-                        val intent = Intent(this@FloatingWindowService, ScreenshotService::class.java).apply {
+                        val intent = Intent(
+                            this@FloatingWindowService,
+                            ScreenshotService::class.java
+                        ).apply {
                             action = ScreenshotService.ACTION_TAKE_SCREENSHOT
                         }
                         startForegroundService(intent)
@@ -109,6 +111,7 @@ class FloatingWindowService : Service() {
                         initialTouchY = event.rawY
                         return true
                     }
+
                     MotionEvent.ACTION_MOVE -> {
                         params.x = initialX + (event.rawX - initialTouchX).toInt()
                         params.y = initialY + (event.rawY - initialTouchY).toInt()
